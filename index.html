@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>তীরন্দাজ আপেল শিকার - Apple Archery Game</title>
+  <meta name="description" content="An archery web game where you shoot arrows at moving apples with escalating difficulty and 10 points per target hit." />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background-color: #090d16;
+      color: #f1f5f9;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+    }
+    header {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(220, 38, 38, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .hud-bar {
+      width: 100%;
+      max-width: 960px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 16px;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .step-badge {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .hud-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .score-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid rgba(30, 41, 59, 0.8);
+      padding: 6px 14px;
+      border-radius: 12px;
+    }
+    .stat-col {
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fbbf24;
+      line-height: 1.1;
+    }
+    .stat-value.high {
+      color: #e2e8f0;
+      font-size: 16px;
+    }
+    .quiver {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .arrow-icon {
+      width: 8px;
+      height: 22px;
+      background: linear-gradient(to top, #dc2626, #fbbf24);
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+    }
+    .arrow-icon.empty {
+      background: rgba(51, 65, 85, 0.4);
+      box-shadow: none;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+    }
+    .btn {
+      background: rgba(30, 41, 59, 0.9);
+      color: #cbd5e1;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      padding: 7px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      touch-action: none;
+      cursor: crosshair;
+      margin: 8px 0;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .aim-tip {
+      position: absolute;
+      bottom: 14px;
+      left: 20px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #94a3b8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .aim-tip::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .controls-hint {
+      width: 100%;
+      max-width: 960px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(30, 41, 59, 0.7);
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #94a3b8;
+      gap: 8px;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 24px;
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    }
+    .modal-card.success {
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+    .modal-card.danger {
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+    .modal-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    .modal-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .btn-action {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .btn-action.success {
+      background: linear-gradient(135deg, #10b981, #14b8a6);
+      color: #022c22;
+    }
+    .btn-action.danger {
+      background: linear-gradient(135deg, #dc2626, #ea580c);
+      color: #fff;
+    }
+  </style>
+<script src="/_aistudio-iframe.js?v=2c34bde1"></script></head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🏹</div>
+      <div>
+        <div class="brand-title">
+          <span>তীরন্দাজ আপেল শিকার</span>
+          <span class="badge">HTML5 + JS</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn" id="mute-btn" onclick="toggleAudio()">🔊 সাউন্ড</button>
+      <button class="btn" id="restart-btn" onclick="restartGame()">🔄 নতুন খেলা</button>
+    </div>
+  </header>
+
+  <div class="hud-bar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span class="step-badge" id="step-badge">ধাপ ১</span>
+      <span class="hud-title" id="step-title">মৃদু গতি</span>
+    </div>
+    <div class="score-box">
+      <div class="stat-col">
+        <div class="stat-label">স্কোর (+১০)</div>
+        <div class="stat-value" id="score-val">0</div>
+      </div>
+      <div style="width:1px; height:24px; background:#334155;"></div>
+      <div class="stat-col">
+        <div class="stat-label">সর্বোচ্চ</div>
+        <div class="stat-value high" id="high-score-val">0</div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end;">
+      <div class="stat-label">তীর বাকি</div>
+      <div class="quiver" id="quiver-container"></div>
+    </div>
+  </div>
+
+  <div class="canvas-container" id="canvas-container">
+    <canvas id="game-canvas" width="960" height="540"></canvas>
+    <div class="aim-tip" id="aim-tip">তীর ছুড়তে ধনুক পেছনে টেনে ছেড়ে দিন (Drag & Release)</div>
+  </div>
+
+  <div class="controls-hint">
+    <div>কন্ট্রোল: মাউস দিয়ে ধনুক পেছনে টানুন এবং নিশানা করে ছেড়ে দিন</div>
+    <div style="display:flex; gap:12px;">
+      <span style="color:#fbbf24;">প্রতি সফল টার্গেটে: +১০ পয়েন্ট</span>
+      <span style="color:#34d399;">R = রিস্টার্ট</span>
+    </div>
+  </div>
+
+  <!-- Step Clear Modal -->
+  <div class="modal-overlay" id="step-modal">
+    <div class="modal-card success">
+      <div style="font-size:40px;">🎯</div>
+      <div class="modal-title">+১০ পয়েন্ট অর্জিত!</div>
+      <div class="modal-desc" id="next-step-desc">চমৎকার নিশানা! আপনি সফলভাবে চলন্ত আপেলে আঘাত করেছেন। পরবর্তী ধাপে গতি ও বাধা কঠিনতর হবে।</div>
+      <button class="btn-action success" onclick="advanceStep()">পরবর্তী কঠিন ধাপে যান ➔</button>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="modal-overlay" id="gameover-modal">
+    <div class="modal-card danger">
+      <div style="font-size:40px;">🏹</div>
+      <div class="modal-title">তীর শেষ! খেলা সমাপ্ত</div>
+      <div class="modal-desc" id="gameover-desc">আপনার সব তীর শেষ হয়ে গেছে। আবার চেষ্টা করুন!</div>
+      <button class="btn-action danger" onclick="restartGame()">পুনরায় খেলুন 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // Pure Web Audio Synth
+    let audioCtx = null;
+    let isMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function toggleAudio() {
+      isMuted = !isMuted;
+      document.getElementById('mute-btn').innerText = isMuted ? '🔇 মিউট' : '🔊 সাউন্ড';
+    }
+
+    function playShootSound() {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    }
+
+    function playHitSound() {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(580, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.14);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    }
+
+    function playDeflectSound() {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.1);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.13);
+    }
+
+    // Step Configurations
+    const STEPS = [
+      { step: 1, title: 'মৃদু গতি', speed: 1.0, radius: 26, wave: false, wind: 0, shield: false, arrows: 5 },
+      { step: 2, title: 'গতি বৃদ্ধি', speed: 1.6, radius: 24, wave: false, wind: 0, shield: false, arrows: 5 },
+      { step: 3, title: 'দোদুল্যমান গতি', speed: 2.1, radius: 23, wave: true, wind: 0, shield: false, arrows: 5 },
+      { step: 4, title: 'বাতাসের বেগ', speed: 2.5, radius: 22, wave: true, wind: 2.8, shield: false, arrows: 6 },
+      { step: 5, title: 'ঘুরন্ত কাঠের ঢাল', speed: 2.8, radius: 21, wave: true, wind: -2.2, shield: true, arrows: 6 },
+      { step: 6, title: 'দ্রুত বেগ ও ছোট আপেল', speed: 3.4, radius: 19, wave: true, wind: 4.2, shield: true, arrows: 6 },
+      { step: 7, title: 'ঝড়ের তীরন্দাজ', speed: 4.0, radius: 18, wave: true, wind: -5.0, shield: true, arrows: 7 },
+      { step: 8, title: 'মাস্টার ধনুর্বিদ পরীক্ষা', speed: 4.6, radius: 16, wave: true, wind: 6.0, shield: true, arrows: 7 },
+    ];
+
+    function getStepConfig(s) {
+      if (s <= STEPS.length) return STEPS[s - 1];
+      const base = STEPS[STEPS.length - 1];
+      const extra = s - STEPS.length;
+      return {
+        step: s,
+        title: `অনন্ত স্তর ${s}`,
+        speed: base.speed + extra * 0.4,
+        radius: Math.max(14, base.radius - extra * 0.5),
+        wave: true,
+        wind: (s % 2 === 0 ? 1 : -1) * Math.min(8, 5.0 + extra * 0.5),
+        shield: true,
+        arrows: 6
+      };
+    }
+
+    // Game Variables
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const V_WIDTH = 960;
+    const V_HEIGHT = 540;
+    const GRAVITY = 0.38;
+
+    let currentStep = 1;
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem('apple_archery_high') || '0', 10);
+    document.getElementById('high-score-val').innerText = highScore;
+
+    let arrowsRemaining = 5;
+    let isAiming = false;
+    let aimStart = null;
+    let currentAim = null;
+    let isGameOver = false;
+    let isStepCleared = false;
+
+    // Entities
+    const bow = { x: 120, y: V_HEIGHT / 2 };
+    let target = { x: 760, y: 270, baseX: 760, baseY: 270, radius: 26, phase: 0, isHit: false, hitTimer: 0 };
+    let shield = null;
+    let arrows = [];
+    let particles = [];
+    let floatingTexts = [];
+
+    function initStep(s) {
+      const cfg = getStepConfig(s);
+      currentStep = s;
+      arrowsRemaining = cfg.arrows;
+      target = {
+        x: 760,
+        y: 270,
+        baseX: 760,
+        baseY: 270,
+        radius: cfg.radius,
+        phase: 0,
+        isHit: false,
+        hitTimer: 0
+      };
+      if (cfg.shield) {
+        shield = {
+          x: 640,
+          y: 270,
+          baseY: 270,
+          width: 28,
+          height: 100,
+          rotation: 0,
+          rotSpeed: 0.04 * cfg.speed
+        };
+      } else {
+        shield = null;
+      }
+      arrows = [];
+      particles = [];
+      floatingTexts = [];
+      isGameOver = false;
+      isStepCleared = false;
+      document.getElementById('step-badge').innerText = `ধাপ ${s}`;
+      document.getElementById('step-title').innerText = cfg.title;
+      document.getElementById('score-val').innerText = score;
+      document.getElementById('step-modal').classList.remove('active');
+      document.getElementById('gameover-modal').classList.remove('active');
+      renderQuiver();
+    }
+
+    function renderQuiver() {
+      const cfg = getStepConfig(currentStep);
+      const container = document.getElementById('quiver-container');
+      container.innerHTML = '';
+      for (let i = 0; i < cfg.arrows; i++) {
+        const div = document.createElement('div');
+        div.className = 'arrow-icon' + (i >= arrowsRemaining ? ' empty' : '');
+        container.appendChild(div);
+      }
+    }
+
+    function restartGame() {
+      score = 0;
+      initStep(1);
+    }
+
+    function advanceStep() {
+      initStep(currentStep + 1);
+    }
+
+    // Pointer Events for Bow Aiming
+    function getVirtualCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = V_WIDTH / rect.width;
+      const scaleY = V_HEIGHT / rect.height;
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (isGameOver || isStepCleared || arrowsRemaining <= 0) return;
+      initAudio();
+      isAiming = true;
+      aimStart = getVirtualCoords(e);
+      currentAim = aimStart;
+      document.getElementById('aim-tip').style.display = 'none';
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isAiming) return;
+      currentAim = getVirtualCoords(e);
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (!isAiming) return;
+      isAiming = false;
+      if (!aimStart || !currentAim || arrowsRemaining <= 0) return;
+
+      let dx = bow.x - currentAim.x;
+      let dy = bow.y - currentAim.y;
+      if (currentAim.x > bow.x) {
+        dx = currentAim.x - bow.x;
+        dy = currentAim.y - bow.y;
+      }
+      const dist = Math.hypot(dx, dy);
+      if (dist < 15) return;
+
+      const power = Math.min(27, Math.max(9, (dist / 130) * 27));
+      const angle = Math.atan2(dy, dx);
+
+      arrows.push({
+        x: bow.x + 20 * Math.cos(angle),
+        y: bow.y + 20 * Math.sin(angle),
+        vx: Math.cos(angle) * power,
+        vy: Math.sin(angle) * power,
+        angle: angle,
+        length: 54,
+        isStuck: false,
+        isDeflected: false
+      });
+
+      arrowsRemaining--;
+      renderQuiver();
+      playShootSound();
+      aimStart = null;
+      currentAim = null;
+    });
+
+    // Main Engine Loop
+    let tick = 0;
+    function loop() {
+      tick++;
+      const cfg = getStepConfig(currentStep);
+
+      // Target Motion
+      if (!target.isHit) {
+        target.phase += 0.035 * cfg.speed;
+        target.y += Math.sin(target.phase * 1.1) * (140 * 0.03 * cfg.speed);
+        if (target.y < 80) target.y = 80;
+        if (target.y > V_HEIGHT - 80) target.y = V_HEIGHT - 80;
+        if (cfg.wave) {
+          target.x = target.baseX + Math.sin(target.phase * 0.6) * 60;
+        }
+      } else {
+        target.hitTimer++;
+        if (target.hitTimer === 45 && !isStepCleared) {
+          isStepCleared = true;
+          document.getElementById('step-modal').classList.add('active');
+        }
+      }
+
+      // Shield Motion
+      if (shield) {
+        shield.rotation += shield.rotSpeed;
+        shield.y = shield.baseY + Math.sin(tick * 0.035 * cfg.speed) * 120;
+      }
+
+      // Arrow Physics
+      const wind = cfg.wind * 0.045;
+      for (let i = arrows.length - 1; i >= 0; i--) {
+        const arr = arrows[i];
+        if (arr.isStuck) {
+          arr.x = target.x + (arr.relX || 0);
+          arr.y = target.y + (arr.relY || 0);
+          continue;
+        }
+
+        arr.vx += wind;
+        arr.vy += GRAVITY;
+        arr.x += arr.vx;
+        arr.y += arr.vy;
+        arr.angle = Math.atan2(arr.vy, arr.vx);
+
+        const tipX = arr.x + Math.cos(arr.angle) * (arr.length / 2);
+        const tipY = arr.y + Math.sin(arr.angle) * (arr.length / 2);
+
+        // Check Shield
+        if (shield && !arr.isDeflected) {
+          if (Math.abs(tipX - shield.x) < shield.width / 2 + 8 && Math.abs(tipY - shield.y) < shield.height / 2 + 8) {
+            arr.isDeflected = true;
+            arr.vx = -arr.vx * 0.4 + (Math.random() - 0.5) * 4;
+            arr.vy = -3 + (Math.random() - 0.5) * 4;
+            playDeflectSound();
+            floatingTexts.push({ x: shield.x - 20, y: shield.y - 20, text: 'Blocked!', color: '#fbbf24', alpha: 1, vy: -1.2 });
+          }
+        }
+
+        // Check Target Hit (+10 Points)
+        if (!target.isHit && !arr.isDeflected) {
+          const dist = Math.hypot(tipX - target.x, tipY - target.y);
+          if (dist <= target.radius + 6) {
+            target.isHit = true;
+            arr.isStuck = true;
+            arr.relX = tipX - target.x;
+            arr.relY = tipY - target.y;
+
+            // Score: 10 points
+            score += 10;
+            if (score > highScore) {
+              highScore = score;
+              localStorage.setItem('apple_archery_high', highScore);
+              document.getElementById('high-score-val').innerText = highScore;
+            }
+            document.getElementById('score-val').innerText = score;
+
+            playHitSound();
+            floatingTexts.push({ x: target.x, y: target.y - 30, text: '+10', color: '#4ade80', alpha: 1, vy: -1.8 });
+
+            // Particles
+            for (let p = 0; p < 28; p++) {
+              const a = Math.random() * Math.PI * 2;
+              const s = Math.random() * 6 + 2;
+              particles.push({
+                x: tipX,
+                y: tipY,
+                vx: Math.cos(a) * s,
+                vy: Math.sin(a) * s,
+                r: Math.random() * 3 + 2,
+                color: Math.random() < 0.2 ? '#22c55e' : '#dc2626',
+                alpha: 1,
+                life: 0,
+                maxLife: 40
+              });
+            }
+          }
+        }
+
+        // Out of bounds
+        if (!arr.isStuck && (arr.x > V_WIDTH + 60 || arr.x < -60 || arr.y > V_HEIGHT + 60)) {
+          arrows.splice(i, 1);
+          if (arrowsRemaining <= 0 && !target.isHit && arrows.length === 0 && !isGameOver) {
+            isGameOver = true;
+            document.getElementById('gameover-modal').classList.add('active');
+          }
+        }
+      }
+
+      // Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life++;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.alpha = 1 - p.life / p.maxLife;
+        if (p.life >= p.maxLife) particles.splice(i, 1);
+      }
+
+      // Floating texts
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const t = floatingTexts[i];
+        t.y += t.vy;
+        t.alpha -= 0.02;
+        if (t.alpha <= 0) floatingTexts.splice(i, 1);
+      }
+
+      // ---------------- RENDER ----------------
+      ctx.clearRect(0, 0, V_WIDTH, V_HEIGHT);
+
+      // Sky Background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+      bgGrad.addColorStop(0, '#0f172a');
+      bgGrad.addColorStop(0.5, '#1e293b');
+      bgGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+      // Rail & Pulley Cable
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(target.baseX - 160, 24);
+      ctx.lineTo(target.baseX + 160, 24);
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.arc(target.x, 24, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(target.x, 24);
+      ctx.lineTo(target.x, target.y - target.radius - 8);
+      ctx.stroke();
+
+      // Shield Obstacle
+      if (shield) {
+        ctx.save();
+        ctx.translate(shield.x, shield.y);
+        ctx.rotate(shield.rotation);
+        ctx.fillStyle = '#b45309';
+        ctx.strokeStyle = '#d97706';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(-shield.width / 2, -shield.height / 2, shield.width, shield.height, 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Apple Target
+      ctx.save();
+      ctx.translate(target.x, target.y);
+
+      // Target disk
+      ctx.beginPath();
+      ctx.arc(0, 0, target.radius + 14, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(254, 243, 199, 0.15)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Juicy Apple
+      const r = target.radius;
+      const appleGrad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r);
+      appleGrad.addColorStop(0, '#f87171');
+      appleGrad.addColorStop(0.4, '#dc2626');
+      appleGrad.addColorStop(1, '#7f1d1d');
+      ctx.fillStyle = appleGrad;
+      ctx.beginPath();
+      ctx.arc(-r * 0.28, 0, r * 0.76, 0, Math.PI * 2);
+      ctx.arc(r * 0.28, 0, r * 0.76, 0, Math.PI * 2);
+      ctx.arc(0, r * 0.15, r * 0.82, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Stem & Leaf
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, -r * 0.6);
+      ctx.lineTo(r * 0.25, -r * 1.2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.ellipse(r * 0.3, -r * 0.95, r * 0.35, r * 0.18, Math.PI / 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Arrows
+      arrows.forEach((arr) => {
+        ctx.save();
+        ctx.translate(arr.x, arr.y);
+        ctx.rotate(arr.angle);
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-arr.length / 2, 0);
+        ctx.lineTo(arr.length / 2, 0);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(-arr.length / 2, 0);
+        ctx.lineTo(-arr.length / 2 - 8, -5);
+        ctx.lineTo(-arr.length / 2 + 4, -5);
+        ctx.lineTo(-arr.length / 2 + 8, 0);
+        ctx.lineTo(-arr.length / 2 + 4, 5);
+        ctx.lineTo(-arr.length / 2 - 8, 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Bow
+      ctx.save();
+      ctx.translate(bow.x, bow.y);
+      let bowAngle = 0;
+      let drawDist = 0;
+      if (isAiming && currentAim) {
+        let dx = bow.x - currentAim.x;
+        let dy = bow.y - currentAim.y;
+        if (currentAim.x > bow.x) {
+          dx = currentAim.x - bow.x;
+          dy = currentAim.y - bow.y;
+        }
+        bowAngle = Math.atan2(dy, dx);
+        drawDist = Math.min(36, Math.hypot(dx, dy) * 0.28);
+      }
+      ctx.rotate(bowAngle);
+
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(0, 0, 56, -Math.PI * 0.38, Math.PI * 0.38);
+      ctx.stroke();
+
+      const topTipX = Math.cos(-Math.PI * 0.38) * 56;
+      const topTipY = Math.sin(-Math.PI * 0.38) * 56;
+      const botTipX = Math.cos(Math.PI * 0.38) * 56;
+      const botTipY = Math.sin(Math.PI * 0.38) * 56;
+
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(topTipX, topTipY);
+      ctx.lineTo(topTipX - drawDist, 0);
+      ctx.lineTo(botTipX, botTipY);
+      ctx.stroke();
+      ctx.restore();
+
+      // Trajectory Prediction Guide Dots
+      if (isAiming && currentAim && arrowsRemaining > 0) {
+        ctx.save();
+        let dx = bow.x - currentAim.x;
+        let dy = bow.y - currentAim.y;
+        if (currentAim.x > bow.x) {
+          dx = currentAim.x - bow.x;
+          dy = currentAim.y - bow.y;
+        }
+        const dist = Math.hypot(dx, dy);
+        const power = Math.min(27, Math.max(9, (dist / 130) * 27));
+        const angle = Math.atan2(dy, dx);
+
+        let sx = bow.x + 20 * Math.cos(angle);
+        let sy = bow.y + 20 * Math.sin(angle);
+        let svx = Math.cos(angle) * power;
+        let svy = Math.sin(angle) * power;
+
+        for (let s = 0; s < 24; s++) {
+          svx += wind;
+          svy += GRAVITY;
+          sx += svx;
+          sy += svy;
+          ctx.fillStyle = `rgba(250, 204, 21, ${Math.max(0.1, 0.7 - s * 0.03)})`;
+          ctx.beginPath();
+          ctx.arc(sx, sy, Math.max(1.8, 3.2 - s * 0.08), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Particles
+      particles.forEach((p) => {
+        ctx.save();
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Floating text
+      floatingTexts.forEach((t) => {
+        ctx.save();
+        ctx.font = 'bold 22px system-ui';
+        ctx.fillStyle = t.color;
+        ctx.globalAlpha = t.alpha;
+        ctx.textAlign = 'center';
+        ctx.fillText(t.text, t.x, t.y);
+        ctx.restore();
+      });
+
+      requestAnimationFrame(loop);
+    }
+
+    initStep(1);
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
