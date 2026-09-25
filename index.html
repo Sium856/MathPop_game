@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Math Pop - গণিত খেলা</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #060911;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 440px;
+      height: 100%;
+      max-height: 920px;
+      background: linear-gradient(180deg, #0A0E17 0%, #101725 50%, #0B0F19 100%);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 229, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Top Bar */
+    header {
+      padding: 12px 16px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title-area h1 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .title-area span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #94A3B8;
+    }
+
+    .high-score-tag {
+      font-size: 11px;
+      color: #FFD600;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Difficulty Pills */
+    .diff-switch {
+      display: flex;
+      background: #131D2D;
+      border: 1px solid #24344B;
+      border-radius: 20px;
+      padding: 3px;
+    }
+
+    .diff-btn {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .diff-btn.active {
+      background: #00E5FF;
+      color: #0A0F18;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: #CBD5E1;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #162030;
+      border: 1px solid #233247;
+      border-radius: 14px;
+      padding: 7px 14px;
+    }
+
+    .score-box {
+      font-size: 13px;
+      color: #94A3B8;
+    }
+
+    .score-box strong {
+      font-size: 18px;
+      font-weight: 900;
+      color: #00E5FF;
+      margin-left: 2px;
+    }
+
+    .streak-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFD600;
+      background: #332010;
+      border: 1px solid rgba(255, 214, 0, 0.4);
+      padding: 3px 8px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .hearts-row {
+      display: flex;
+      gap: 3px;
+    }
+
+    .heart-icon {
+      font-size: 18px;
+      color: #FF1744;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .heart-icon.lost {
+      color: #475569;
+      opacity: 0.5;
+      transform: scale(0.85);
+    }
+
+    /* 3 Lights Indicator Panel */
+    .light-panel {
+      margin: 8px 16px 4px;
+      background: linear-gradient(180deg, #1B2433 0%, #101724 100%);
+      border: 1px solid #2E3D52;
+      border-radius: 18px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 15;
+    }
+
+    .lamp-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .lamp-fixture {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .lamp-bezel {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #0A0F18;
+      border: 1.5px solid #374151;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s;
+    }
+
+    .lamp-bulb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #2C3545 0%, #151B26 100%);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .lamp-col span {
+      font-size: 11px;
+      font-weight: 500;
+      color: #8896AB;
+      transition: color 0.2s;
+    }
+
+    /* Lamp Glow States */
+    /* RED LAMP (ভুল) */
+    .lamp-col.active.red .lamp-bezel {
+      border-color: #FF1744;
+    }
+    .lamp-col.active.red .lamp-bulb {
+      background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #FF1744 50%, #B71C1C 100%);
+      box-shadow: 0 0 15px #FF1744, 0 0 30px rgba(255, 23, 68, 0.7);
+    }
+    .lamp-col.active.red span {
+      color: #FF1744;
+      font-weight: 700;
+    }
+
+    /* YELLOW LAMP (মিস / সময় শেষ) */
+    .lamp-col.active.yellow .lamp-bezel {
+      border-color: #FFD600;
+    }
+    .lamp-col.active.yellow .lamp-bulb {
+      background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #FFD600 50%, #F57F17 100%);
+      box-shadow: 0 0 15px #FFD600, 0 0 30px rgba(255, 214, 0, 0.7);
+    }
+    .lamp-col.active.yellow span {
+      color: #FFD600;
+      font-weight: 700;
+    }
+
+    /* GREEN LAMP (সঠিক) */
+    .lamp-col.active.green .lamp-bezel {
+      border-color: #00E676;
+    }
+    .lamp-col.active.green .lamp-bulb {
+      background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #00E676 50%, #1B5E20 100%);
+      box-shadow: 0 0 15px #00E676, 0 0 30px rgba(0, 230, 118, 0.7);
+    }
+    .lamp-col.active.green span {
+      color: #00E676;
+      font-weight: 700;
+    }
+
+    /* Central Floating Arena */
+    #arena {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      margin: 0 8px;
+    }
+
+    .bubble {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: #FFFFFF;
+      cursor: pointer;
+      transform: translate3d(-50%, -50%, 0);
+      will-change: transform;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: transform 0.08s ease, filter 0.15s;
+    }
+
+    .bubble::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      width: 14px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.55);
+      border-radius: 50%;
+      transform: rotate(-35deg);
+      pointer-events: none;
+    }
+
+    .bubble:active {
+      transform: translate3d(-50%, -50%, 0) scale(0.92);
+    }
+
+    /* Bubble Color Schemes */
+    .bubble.hue-0 {
+      background: radial-gradient(circle at 35% 35%, #00E5FF 0%, #0288D1 60%, #01579B 100%);
+      box-shadow: 0 6px 20px rgba(0, 229, 255, 0.4);
+    }
+    .bubble.hue-1 {
+      background: radial-gradient(circle at 35% 35%, #E040FB 0%, #7C4DFF 60%, #4A148C 100%);
+      box-shadow: 0 6px 20px rgba(124, 77, 255, 0.4);
+    }
+    .bubble.hue-2 {
+      background: radial-gradient(circle at 35% 35%, #69F0AE 0%, #00BFA5 60%, #004D40 100%);
+      box-shadow: 0 6px 20px rgba(0, 191, 165, 0.4);
+    }
+    .bubble.hue-3 {
+      background: radial-gradient(circle at 35% 35%, #FFD740 0%, #FF9100 60%, #E65100 100%);
+      box-shadow: 0 6px 20px rgba(255, 145, 0, 0.4);
+    }
+
+    /* Bottom Math Cockpit */
+    footer {
+      padding: 6px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 14, 23, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    /* Feedback Banner */
+    #feedback-banner {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 12px;
+      min-height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    #feedback-banner.correct {
+      background: rgba(0, 230, 118, 0.2);
+      border: 1px solid rgba(0, 230, 118, 0.6);
+      color: #00E676;
+      opacity: 1;
+    }
+
+    #feedback-banner.wrong {
+      background: rgba(255, 23, 68, 0.2);
+      border: 1px solid rgba(255, 23, 68, 0.6);
+      color: #FF1744;
+      opacity: 1;
+    }
+
+    #feedback-banner.missed {
+      background: rgba(255, 214, 0, 0.2);
+      border: 1px solid rgba(255, 214, 0, 0.6);
+      color: #FFD600;
+      opacity: 1;
+    }
+
+    /* Countdown Bar */
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #1E293B;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      width: 100%;
+      height: 100%;
+      background: #00E5FF;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    /* Cockpit Main Box */
+    .cockpit-box {
+      width: 100%;
+      background: linear-gradient(180deg, #162235 0%, #0F1726 100%);
+      border: 1.5px solid #263852;
+      border-radius: 20px;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1);
+    }
+
+    .op-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1E2D44;
+      padding: 6px 12px;
+      border-radius: 12px;
+    }
+
+    .op-symbol {
+      width: 26px;
+      height: 26px;
+      background: rgba(0, 229, 255, 0.2);
+      color: #00E5FF;
+      font-weight: 900;
+      font-size: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .op-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #CBD5E1;
+    }
+
+    #equation-text {
+      font-size: 28px;
+      font-weight: 900;
+      font-family: monospace;
+      letter-spacing: 1px;
+      color: #FFFFFF;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+    }
+
+    .tap-hint {
+      font-size: 11px;
+      color: #94A3B8;
+    }
+
+    /* Modals & Overlays */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(6, 9, 17, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 320px;
+      background: #131C2B;
+      border: 1.5px solid #2A3D58;
+      border-radius: 24px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-icon {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: #94A3B8;
+    }
+
+    .modal-score {
+      font-size: 42px;
+      font-weight: 900;
+      color: #00E5FF;
+      margin: 8px 0;
+    }
+
+    .new-high-badge {
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFD600;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .stats-breakdown {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      background: #0F1622;
+      border: 1px solid #1E2C3F;
+      border-radius: 14px;
+      padding: 10px 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-col strong {
+      font-size: 17px;
+      display: block;
+    }
+
+    .stat-col span {
+      font-size: 10px;
+      color: #94A3B8;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: #00E5FF;
+      color: #0A0F18;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 229, 255, 0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .primary-btn:active {
+      transform: scale(0.97);
+    }
+
+    .secondary-btn {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #CBD5E1;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 14px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    <!-- Header -->
+    <header>
+      <div class="header-top">
+        <div class="title-area">
+          <h1>Math Pop <span>(গণিত খেলা)</span></h1>
+          <div class="high-score-tag">সর্বোচ্চ স্কোর: <span id="high-score-val">0</span></div>
+        </div>
+
+        <div class="diff-switch">
+          <button class="diff-btn active" id="diff-medium-btn" onclick="setDifficulty('MEDIUM')">মিডিয়াম</button>
+          <button class="diff-btn" id="diff-hard-btn" onclick="setDifficulty('HARD')">হার্ড</button>
+        </div>
+
+        <div class="header-actions">
+          <a href="math-pop-project.zip" download="math-pop-project.zip" class="icon-btn" title="প্রজেক্ট জিপ ডাউনলোড করুন (Download ZIP)" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">📦</a>
+          <button class="icon-btn" id="sound-btn" onclick="toggleSound()" title="সাউন্ড টগল">🔊</button>
+          <button class="icon-btn" id="pause-btn" onclick="togglePause()" title="পজ">⏸️</button>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="score-box">স্কোর: <strong id="current-score-val">0</strong></div>
+        <div class="streak-badge" id="streak-badge">🔥 2x স্ট্রিক</div>
+        <div class="hearts-row" id="hearts-container">
+          <span class="heart-icon">❤️</span>
+          <span class="heart-icon">❤️</span>
+          <span class="heart-icon">❤️</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Interactive 3 Lights Panel -->
+    <div class="light-panel">
+      <!-- Red Lamp (ভুল) -->
+      <div class="lamp-col red" id="lamp-red">
+        <div class="lamp-fixture">
+          <div class="lamp-bezel">
+            <div class="lamp-bulb"></div>
+          </div>
+        </div>
+        <span>লাল বাতি (ভুল)</span>
+      </div>
+
+      <!-- Yellow Lamp (মিস / সময় শেষ) -->
+      <div class="lamp-col yellow" id="lamp-yellow">
+        <div class="lamp-fixture">
+          <div class="lamp-bezel">
+            <div class="lamp-bulb"></div>
+          </div>
+        </div>
+        <span>হলুদ বাতি (মিস)</span>
+      </div>
+
+      <!-- Green Lamp (সঠিক) -->
+      <div class="lamp-col green" id="lamp-green">
+        <div class="lamp-fixture">
+          <div class="lamp-bezel">
+            <div class="lamp-bulb"></div>
+          </div>
+        </div>
+        <span>সবুজ বাতি (সঠিক)</span>
+      </div>
+    </div>
+
+    <!-- Central Rising/Floating Bubble Arena -->
+    <div id="arena"></div>
+
+    <!-- Bottom Math Cockpit -->
+    <footer>
+      <div id="feedback-banner"></div>
+
+      <div class="progress-bar-container">
+        <div id="progress-fill"></div>
+      </div>
+
+      <div class="cockpit-box">
+        <div class="op-badge">
+          <div class="op-symbol" id="op-symbol">×</div>
+          <div class="op-name" id="op-name">গুণ</div>
+        </div>
+
+        <div id="equation-text">36 × 4 = ?</div>
+
+        <div class="tap-hint">সঠিকটি চাপুন</div>
+      </div>
+    </footer>
+
+    <!-- Pause Modal -->
+    <div class="modal-overlay" id="pause-modal">
+      <div class="modal-card">
+        <div class="modal-icon">⏸️</div>
+        <div class="modal-title">খেলা স্থগিত</div>
+        <div class="modal-subtitle">Game Paused</div>
+        <div style="height: 20px;"></div>
+        <button class="primary-btn" onclick="togglePause()">চালিয়ে যান</button>
+        <button class="secondary-btn" onclick="restartGame()">নতুন শুরু</button>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal-overlay" id="game-over-modal">
+      <div class="modal-card">
+        <div class="modal-icon">🎮</div>
+        <div class="modal-title">খেলা শেষ!</div>
+        <div class="modal-subtitle">আপনার স্কোর</div>
+        <div class="modal-score" id="final-score">0</div>
+        <div class="new-high-badge" id="new-high-badge">🏆 নতুন সর্বোচ্চ স্কোর!</div>
+
+        <div class="stats-breakdown">
+          <div class="stat-col">
+            <strong style="color: #00E676;" id="stat-correct">0</strong>
+            <span>সঠিক (সবুজ)</span>
+          </div>
+          <div class="stat-col">
+            <strong style="color: #FF1744;" id="stat-wrong">0</strong>
+            <span>ভুল (লাল)</span>
+          </div>
+          <div class="stat-col">
+            <strong style="color: #FFD600;" id="stat-missed">0</strong>
+            <span>মিস (হলুদ)</span>
+          </div>
+        </div>
+
+        <button class="primary-btn" onclick="restartGame()">আবার খেলুন</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Sound System (Web Audio API Synthesizer) */
+    let audioCtx = null;
+    let isSoundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type, duration, delay = 0) {
+      if (!isSoundEnabled) return;
+      initAudio();
+      setTimeout(() => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+      }, delay);
+    }
+
+    function playCorrectSound() {
+      playTone(523.25, 'triangle', 0.12, 0);   // C5
+      playTone(659.25, 'triangle', 0.12, 70);  // E5
+      playTone(783.99, 'triangle', 0.22, 140); // G5
+    }
+
+    function playWrongSound() {
+      playTone(180, 'sawtooth', 0.28, 0);
+      playTone(130, 'sawtooth', 0.32, 100);
+    }
+
+    function playMissedSound() {
+      playTone(350, 'sine', 0.18, 0);
+      playTone(300, 'sine', 0.24, 120);
+    }
+
+    function toggleSound() {
+      isSoundEnabled = !isSoundEnabled;
+      document.getElementById('sound-btn').innerText = isSoundEnabled ? '🔊' : '🔇';
+    }
+
+    /* Game State */
+    const CONFIG = {
+      MEDIUM: { duration: 4600, label: 'মিডিয়াম' },
+      HARD: { duration: 3200, label: 'হার্ড' }
+    };
+
+    let difficulty = 'MEDIUM';
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem('math_pop_high') || '0', 10);
+    let streak = 0;
+    let lives = 3;
+    let isPaused = false;
+    let isRoundTransitioning = false;
+    let isGameOver = false;
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let missedCount = 0;
+
+    let currentProblem = null;
+    let currentOptions = [];
+    let roundStartTime = null;
+    let animationFrameId = null;
+
+    const arenaEl = document.getElementById('arena');
+    const equationEl = document.getElementById('equation-text');
+    const opSymbolEl = document.getElementById('op-symbol');
+    const opNameEl = document.getElementById('op-name');
+    const progressFillEl = document.getElementById('progress-fill');
+    const feedbackBanner = document.getElementById('feedback-banner');
+    const highScoreVal = document.getElementById('high-score-val');
+    const currentScoreVal = document.getElementById('current-score-val');
+    const streakBadge = document.getElementById('streak-badge');
+    const heartsContainer = document.getElementById('hearts-container');
+
+    const lampRed = document.getElementById('lamp-red');
+    const lampYellow = document.getElementById('lamp-yellow');
+    const lampGreen = document.getElementById('lamp-green');
+
+    highScoreVal.innerText = highScore;
+
+    /* Math Generator */
+    const OPS = [
+      { id: 'ADD', symbol: '+', name: 'যোগ' },
+      { id: 'SUB', symbol: '−', name: 'বিয়োগ' },
+      { id: 'MUL', symbol: '×', name: 'গুণ' },
+      { id: 'DIV', symbol: '÷', name: 'ভাগ' }
+    ];
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateProblem(diff) {
+      const op = OPS[Math.floor(Math.random() * OPS.length)];
+      let num1, num2, ans;
+
+      if (diff === 'MEDIUM') {
+        if (op.id === 'ADD') {
+          num1 = randomInt(12, 60);
+          num2 = randomInt(10, 50);
+          ans = num1 + num2;
+        } else if (op.id === 'SUB') {
+          num2 = randomInt(10, 50);
+          ans = randomInt(10, 50);
+          num1 = num2 + ans;
+        } else if (op.id === 'MUL') {
+          num1 = randomInt(3, 12);
+          num2 = randomInt(3, 12);
+          ans = num1 * num2;
+        } else {
+          num2 = randomInt(2, 12);
+          ans = randomInt(2, 12);
+          num1 = num2 * ans;
+        }
+      } else { // HARD
+        if (op.id === 'ADD') {
+          num1 = randomInt(50, 240);
+          num2 = randomInt(35, 180);
+          ans = num1 + num2;
+        } else if (op.id === 'SUB') {
+          num2 = randomInt(40, 200);
+          ans = randomInt(30, 150);
+          num1 = num2 + ans;
+        } else if (op.id === 'MUL') {
+          num1 = randomInt(11, 24);
+          num2 = randomInt(4, 14);
+          ans = num1 * num2;
+        } else {
+          num2 = randomInt(5, 18);
+          ans = randomInt(8, 25);
+          num1 = num2 * ans;
+        }
+      }
+
+      // Generate 3 unique distractors
+      const distractors = new Set();
+      const deltas = [-1, 1, -10, 10, -2, 2, -5, 5, -3, 3].sort(() => 0.5 - Math.random());
+      for (const d of deltas) {
+        const c = ans + d;
+        if (c !== ans && c >= 0) distractors.add(c);
+        if (distractors.size === 3) break;
+      }
+      while (distractors.size < 3) {
+        const c = ans + randomInt(-15, 15);
+        if (c !== ans && c >= 0) distractors.add(c);
+      }
+
+      const allAnswers = [...distractors, ans].sort(() => 0.5 - Math.random());
+      const lanes = [0.15, 0.38, 0.62, 0.85].sort(() => 0.5 - Math.random());
+
+      const options = allAnswers.map((val, idx) => ({
+        id: idx,
+        value: val,
+        isCorrect: val === ans,
+        laneX: lanes[idx] + (Math.random() - 0.5) * 0.04,
+        hue: idx,
+        stagger: (idx % 3 === 0 ? 0 : idx % 3 === 1 ? 18 : -14)
+      }));
+
+      return {
+        num1,
+        num2,
+        op,
+        ans,
+        options,
+        displayText: `${num1} ${op.symbol} ${num2} = ?`
+      };
+    }
+
+    /* Lights Feedback Controller */
+    function setLights(state) {
+      lampRed.classList.remove('active');
+      lampYellow.classList.remove('active');
+      lampGreen.classList.remove('active');
+
+      if (state === 'CORRECT') {
+        lampGreen.classList.add('active');
+      } else if (state === 'WRONG') {
+        lampRed.classList.add('active');
+      } else if (state === 'MISSED') {
+        lampYellow.classList.add('active');
+      }
+    }
+
+    function showBanner(text, type) {
+      feedbackBanner.innerText = text;
+      feedbackBanner.className = '';
+      if (type) {
+        feedbackBanner.classList.add(type);
+      }
+    }
+
+    /* Bubble Arena DOM Management */
+    function renderArenaOptions() {
+      arenaEl.innerHTML = '';
+      currentOptions.forEach(opt => {
+        const el = document.createElement('div');
+        el.className = `bubble hue-${opt.hue}`;
+        el.innerText = opt.value;
+        el.dataset.id = opt.id;
+        el.onclick = () => onSelectOption(opt);
+        arenaEl.appendChild(el);
+        opt.element = el;
+      });
+    }
+
+    /* Main Physics & Animation Loop */
+    function startRound() {
+      if (isGameOver) return;
+      isRoundTransitioning = false;
+      setLights(null);
+      showBanner('', '');
+
+      currentProblem = generateProblem(difficulty);
+      currentOptions = currentProblem.options;
+
+      equationEl.innerText = currentProblem.displayText;
+      opSymbolEl.innerText = currentProblem.op.symbol;
+      opNameEl.innerText = currentProblem.op.name;
+
+      renderArenaOptions();
+
+      roundStartTime = performance.now();
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(tickAnimation);
+    }
+
+    function tickAnimation(currentTime) {
+      if (isPaused || isRoundTransitioning || isGameOver) return;
+
+      const duration = CONFIG[difficulty].duration;
+      const elapsed = currentTime - roundStartTime;
+      const progress = Math.min(Math.max(elapsed / duration, 0), 1);
+
+      // Countdown Bar Update
+      const remainingProgress = 1 - progress;
+      progressFillEl.style.width = `${(remainingProgress * 100).toFixed(1)}%`;
+      if (remainingProgress > 0.5) {
+        progressFillEl.style.background = '#00E5FF';
+      } else if (remainingProgress > 0.25) {
+        progressFillEl.style.background = '#FFD600';
+      } else {
+        progressFillEl.style.background = '#FF1744';
+      }
+
+      // Vertical Trajectory: 1.05 (bottom) -> 0.15 (top) -> 1.05 (bottom)
+      let yProgress;
+      if (progress < 0.40) {
+        const p = progress / 0.40;
+        const ease = 1 - (1 - p) * (1 - p); // easeOut
+        yProgress = 1.05 - (ease * 0.90);
+      } else if (progress < 0.65) {
+        const p = (progress - 0.40) / 0.25;
+        yProgress = 0.15 + Math.sin(p * Math.PI) * 0.05; // hover
+      } else {
+        const p = (progress - 0.65) / 0.35;
+        const ease = p * p; // easeIn
+        yProgress = 0.17 + (ease * 0.88); // descend
+      }
+
+      const arenaW = arenaEl.clientWidth;
+      const arenaH = arenaEl.clientHeight;
+
+      currentOptions.forEach((opt, idx) => {
+        if (!opt.element) return;
+        const swayX = Math.sin(progress * 7 + idx) * 12;
+        const posX = Math.max(35, Math.min(arenaW - 35, arenaW * opt.laneX + swayX));
+        const posY = Math.max(-20, Math.min(arenaH + 40, arenaH * yProgress + opt.stagger));
+
+        opt.element.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+      });
+
+      if (progress >= 1) {
+        handleTimeout();
+      } else {
+        animationFrameId = requestAnimationFrame(tickAnimation);
+      }
+    }
+
+    /* Option Selection Handling */
+    function onSelectOption(selectedOpt) {
+      if (isRoundTransitioning || isGameOver || isPaused) return;
+      isRoundTransitioning = true;
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+      if (selectedOpt.isCorrect) {
+        // CORRECT ANSWER -> GREEN LIGHT
+        playCorrectSound();
+        setLights('CORRECT');
+        streak++;
+        const multiplier = streak >= 5 ? 3 : (streak >= 3 ? 2 : 1);
+        const pts = 10 * multiplier;
+        score += pts;
+        correctCount++;
+
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem('math_pop_high', highScore);
+          highScoreVal.innerText = highScore;
+        }
+
+        showBanner(`সঠিক উত্তর! (+${pts})`, 'correct');
+        updateUIStats();
+
+        setTimeout(startRound, 750);
+      } else {
+        // WRONG ANSWER -> RED LIGHT
+        playWrongSound();
+        setLights('WRONG');
+        streak = 0;
+        lives--;
+        wrongCount++;
+
+        showBanner('ভুল উত্তর!', 'wrong');
+        updateUIStats();
+
+        if (lives <= 0) {
+          setTimeout(triggerGameOver, 600);
+        } else {
+          setTimeout(startRound, 900);
+        }
+      }
+    }
+
+    /* Timeout / Missed Handling */
+    function handleTimeout() {
+      if (isRoundTransitioning || isGameOver || isPaused) return;
+      isRoundTransitioning = true;
+
+      // MISSED -> YELLOW LIGHT
+      playMissedSound();
+      setLights('MISSED');
+      streak = 0;
+      lives--;
+      missedCount++;
+
+      showBanner('সময় শেষ! মিস হয়েছে', 'missed');
+      updateUIStats();
+
+      if (lives <= 0) {
+        setTimeout(triggerGameOver, 600);
+      } else {
+        setTimeout(startRound, 900);
+      }
+    }
+
+    function updateUIStats() {
+      currentScoreVal.innerText = score;
+
+      if (streak > 1) {
+        streakBadge.style.display = 'block';
+        streakBadge.innerText = `🔥 ${streak}x স্ট্রিক`;
+      } else {
+        streakBadge.style.display = 'none';
+      }
+
+      // Hearts
+      const hearts = heartsContainer.children;
+      for (let i = 0; i < 3; i++) {
+        if (i < lives) {
+          hearts[i].classList.remove('lost');
+        } else {
+          hearts[i].classList.add('lost');
+        }
+      }
+    }
+
+    function setDifficulty(diff) {
+      if (difficulty === diff) return;
+      difficulty = diff;
+      document.getElementById('diff-medium-btn').classList.toggle('active', diff === 'MEDIUM');
+      document.getElementById('diff-hard-btn').classList.toggle('active', diff === 'HARD');
+      restartGame();
+    }
+
+    function togglePause() {
+      if (isGameOver) return;
+      isPaused = !isPaused;
+      const pauseModal = document.getElementById('pause-modal');
+      if (isPaused) {
+        pauseModal.classList.add('active');
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      } else {
+        pauseModal.classList.remove('active');
+        roundStartTime = performance.now();
+        animationFrameId = requestAnimationFrame(tickAnimation);
+      }
+    }
+
+    function triggerGameOver() {
+      isGameOver = true;
+      document.getElementById('final-score').innerText = score;
+      document.getElementById('stat-correct').innerText = correctCount;
+      document.getElementById('stat-wrong').innerText = wrongCount;
+      document.getElementById('stat-missed').innerText = missedCount;
+
+      const newHighBadge = document.getElementById('new-high-badge');
+      if (score >= highScore && score > 0) {
+        newHighBadge.style.display = 'block';
+      } else {
+        newHighBadge.style.display = 'none';
+      }
+
+      document.getElementById('game-over-modal').classList.add('active');
+    }
+
+    function restartGame() {
+      document.getElementById('game-over-modal').classList.remove('active');
+      document.getElementById('pause-modal').classList.remove('active');
+      score = 0;
+      streak = 0;
+      lives = 3;
+      correctCount = 0;
+      wrongCount = 0;
+      missedCount = 0;
+      isGameOver = false;
+      isPaused = false;
+      updateUIStats();
+      startRound();
+    }
+
+    // Start game on load
+    window.addEventListener('load', () => {
+      startRound();
+    });
+  </script>
+</body>
+</html>

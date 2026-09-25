@@ -1,0 +1,6 @@
+{
+  "name": "Math Pop",
+  "description": "A fast-paced math arcade game with medium and hard levels where floating answer options rise and fall, featuring interactive green, red, and yellow indicator lights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

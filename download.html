@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Pop (গণিত খেলা) - ডাউনলোড প্রজেক্ট</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #060911;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 640px;
+      width: 100%;
+      background: #0E1624;
+      border: 1px solid #1E2D44;
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px rgba(0, 229, 255, 0.12);
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(0, 229, 255, 0.15);
+      color: #00E5FF;
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #FFFFFF;
+    }
+    p.desc {
+      font-size: 14px;
+      color: #94A3B8;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .dl-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 800;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .dl-btn-primary {
+      background: linear-gradient(135deg, #00E5FF 0%, #00B0FF 100%);
+      color: #060911;
+      box-shadow: 0 4px 20px rgba(0, 229, 255, 0.35);
+    }
+    .dl-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 229, 255, 0.5);
+    }
+    .dl-btn-secondary {
+      background: #152238;
+      color: #F8FAFC;
+      border: 1px solid #2B3D5A;
+    }
+    .dl-btn-secondary:hover {
+      background: #1C2E4A;
+    }
+    .features-list {
+      background: #0A0F1A;
+      border: 1px solid #1A263A;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+    .features-list h3 {
+      font-size: 15px;
+      color: #00E676;
+      margin-bottom: 12px;
+    }
+    .features-list ul {
+      list-style-type: none;
+      font-size: 13px;
+      color: #CBD5E1;
+      line-height: 1.8;
+    }
+    .features-list li::before {
+      content: "✓ ";
+      color: #00E5FF;
+      font-weight: bold;
+    }
+    .file-tree {
+      background: #05080E;
+      border: 1px solid #141E2E;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #94A3B8;
+      line-height: 1.6;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .preview-box {
+      width: 100%;
+      height: 480px;
+      border: 1px solid #1E2D44;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">Math Pop (গণিত খেলা)</div>
+    <h1>Math Pop Project Download</h1>
+    <p class="desc">
+      এখানে শুধুমাত্র <strong>Math Pop (গণিত খেলা)</strong> এর আসল সোর্স কোড ও ফাইলসমূহ রয়েছে (Android Kotlin Jetpack Compose এবং সিঙ্গেল-ফাইল HTML/JS Web App)। নিচে দেওয়া বাটনে ক্লিক করে সরাসরি ZIP ফাইল নামিয়ে নিন।
+    </p>
+
+    <div class="btn-group">
+      <a href="math-pop-bangla-game.zip" download="math-pop-bangla-game.zip" class="dl-btn dl-btn-primary">
+        📦 Math Pop সম্পূর্ণ প্রজেক্ট ডাউনলোড করুন (.ZIP)
+      </a>
+      <a href="index.html" download="index.html" class="dl-btn dl-btn-secondary">
+        🌐 ব্রাউজারে খেলার জন্য index.html ডাউনলোড করুন
+      </a>
+      <a href="index.html" class="dl-btn dl-btn-secondary">
+        🎮 সরাসরি ব্রাউজারে গেমটি খেলুন (Live Web App)
+      </a>
+    </div>
+
+    <div class="features-list">
+      <h3>প্রজেক্টে যা যা অন্তর্ভুক্ত রয়েছে:</h3>
+      <ul>
+        <li><strong>গণিত সমীক্ষা ককপিট</strong>: যোগ (+), বিয়োগ (−), গুণ (×), ভাগ (÷)</li>
+        <li><strong>মিডিয়াম ও হার্ড লেভেল</strong>: ডায়নামিক প্রশ্ন জেনারেটর</li>
+        <li><strong>ফ্লোটিং বাবল মেকানিক্স</strong>: নিচ থেকে ভেসে ওঠা এবং ৩-৫ সেকেন্ড পর নেমে যাওয়া বাবল</li>
+        <li><strong>রিয়েল-টাইম লাইট ফিডব্যাক</strong>: সঠিক = সবুজ বাতি, ভুল = লাল বাতি, মিস/টাইমআউট = হলুদ বাতি</li>
+        <li><strong>অ্যান্ড্রয়েড প্রজেক্ট</strong>: Jetpack Compose, ViewModel, Material 3, Web Audio / Sound Pool</li>
+      </ul>
+    </div>
+
+    <div class="file-tree">
+      <strong>ZIP ফাইলের ভেতরের ফাইলসমূহ:</strong><br>
+      ├── index.html (পূর্ণাঙ্গ ওয়েব গেম)<br>
+      ├── app/src/main/java/com/example/<br>
+      │   ├── MainActivity.kt<br>
+      │   ├── viewmodel/MathGameViewModel.kt<br>
+      │   ├── ui/MathGameScreen.kt<br>
+      │   ├── ui/components/FloatingBubbleArena.kt<br>
+      │   ├── ui/components/LightIndicatorPanel.kt<br>
+      │   ├── ui/components/MathQuestionCockpit.kt<br>
+      │   ├── util/MathProblemGenerator.kt<br>
+      │   └── util/SoundFeedbackHelper.kt<br>
+      ├── build.gradle.kts & settings.gradle.kts<br>
+      └── gradle/libs.versions.toml
+    </div>
+
+    <h3 style="font-size: 15px; margin-bottom: 10px; color: #F8FAFC;">লাইভ গেম প্রিভিউ:</h3>
+    <div class="preview-box">
+      <iframe src="index.html" title="Math Pop Game"></iframe>
+    </div>
+  </div>
+</body>
+</html>
